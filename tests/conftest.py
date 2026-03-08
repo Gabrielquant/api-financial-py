@@ -1,7 +1,7 @@
 """Fixtures compartilhadas para os testes."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models.user import User, UserRole
 
-_now = datetime.now(timezone.utc)
+_now = datetime.now(UTC)
 
 
 @pytest.fixture

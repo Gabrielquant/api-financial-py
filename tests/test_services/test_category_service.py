@@ -1,7 +1,7 @@
 """Testes do serviço de categorias."""
 
-from uuid import uuid4
 from unittest.mock import AsyncMock, MagicMock, patch
+from uuid import uuid4
 
 import pytest
 
@@ -63,8 +63,9 @@ async def test_create_duplicate_name_type_raises_conflict(mock_db, user_id):
 def test_create_empty_name_rejected_by_schema():
     """CategoryCreate rejeita nome só com espaços (strip + min_length=1 no schema)."""
     from pydantic import ValidationError
-    from app.schemas.category import CategoryCreate
+
     from app.models.category import CategoryType
+    from app.schemas.category import CategoryCreate
 
     with pytest.raises(ValidationError):
         CategoryCreate(name="   ", type=CategoryType.expense)

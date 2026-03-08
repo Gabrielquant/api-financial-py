@@ -34,6 +34,9 @@ venv/
 env/
 .env/
 
+# Ruff
+.ruff_cache/
+
 # Testing / coverage
 .pytest_cache/
 .coverage

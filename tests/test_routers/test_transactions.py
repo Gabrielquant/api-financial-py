@@ -1,10 +1,9 @@
 """Testes das rotas de transações (/transactions)."""
 
-from datetime import date
+from datetime import UTC, date
 from decimal import Decimal
-from uuid import uuid4
-
 from unittest.mock import AsyncMock, patch
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -21,7 +20,7 @@ def category_id(test_user):
 @pytest.fixture
 def transaction_model(test_user, category_id):
     """Transação fake retornada pelo service mock."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     return Transaction(
         id=uuid4(),
@@ -31,7 +30,7 @@ def transaction_model(test_user, category_id):
         type=CategoryType.expense,
         description="Supermercado",
         transaction_date=date(2025, 3, 1),
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
     )
 
 

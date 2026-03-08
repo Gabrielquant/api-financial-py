@@ -1,6 +1,7 @@
 """Testes das rotas de categorias (/categories)."""
 
 import uuid
+from datetime import UTC
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -12,14 +13,14 @@ from app.models.category import Category, CategoryType
 @pytest.fixture
 def category_model(test_user):
     """Categoria fake retornada pelo service mock."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     return Category(
         id=uuid.uuid4(),
         user_id=test_user.id,
         name="Alimentação",
         type=CategoryType.expense,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
     )
 
 

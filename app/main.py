@@ -1,6 +1,6 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-import uvicorn
 
 from app.api.routers import auth, categories, transactions
 from app.core.exceptions import AppException

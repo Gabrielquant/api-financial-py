@@ -1,12 +1,12 @@
 """Model Transaction."""
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from sqlalchemy import Date, DateTime, Enum, ForeignKey, Numeric, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.category import Category, CategoryType
@@ -14,8 +14,6 @@ from app.models.user import User
 
 
 class Transaction(Base):
-    """Lançamento financeiro (receita/despesa)."""
-
     __tablename__ = "transactions"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -49,7 +47,7 @@ class Transaction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
     )
 
     user: Mapped["User"] = relationship("User", back_populates="transactions")

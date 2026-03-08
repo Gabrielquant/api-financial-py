@@ -3,11 +3,11 @@
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import UnauthorizedError
 from app.core.security import (
     decode_and_validate_cognito_token,
     get_token_from_authorization_header,
 )
-from app.core.exceptions import UnauthorizedError
 from app.db.session import get_db
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
