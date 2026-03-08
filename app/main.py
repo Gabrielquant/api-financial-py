@@ -1,5 +1,9 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 import uvicorn
+
+from app.api.routers import auth
+from app.core.exceptions import AppException
 
 app = FastAPI(
     title="Financial API",
@@ -16,6 +20,18 @@ def root() -> dict[str, str]:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "healthy"}
+
+
+app.include_router(auth.router)
+
+
+@app.exception_handler(AppException)
+def app_exception_handler(_request, exc: AppException) -> JSONResponse:
+    """Retorna respostas consistentes para exceções da aplicação."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
 
 
 if __name__ == "__main__":
