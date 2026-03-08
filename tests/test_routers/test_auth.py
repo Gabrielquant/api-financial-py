@@ -2,7 +2,6 @@
 
 from unittest.mock import AsyncMock, patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.schemas.auth import TokenResponse
@@ -10,8 +9,12 @@ from app.schemas.auth import TokenResponse
 
 def test_register_success(client: TestClient):
     """POST /auth/register retorna 201 e mensagem quando o serviço registra com sucesso."""
-    with patch("app.api.routers.auth.auth_service.register", new_callable=AsyncMock) as mock_register:
-        mock_register.return_value = {"message": "User registered. Email verified. You can sign in."}
+    with patch(
+        "app.api.routers.auth.auth_service.register", new_callable=AsyncMock
+    ) as mock_register:
+        mock_register.return_value = {
+            "message": "User registered. Email verified. You can sign in."
+        }
         resp = client.post(
             "/auth/register",
             json={"email": "new@example.com", "password": "senha1234"},
@@ -32,7 +35,9 @@ def test_register_validation(client: TestClient):
 
 def test_login_success(client: TestClient):
     """POST /auth/login retorna 200 e tokens quando credenciais são válidas."""
-    with patch("app.api.routers.auth.auth_service.login", new_callable=AsyncMock) as mock_login:
+    with patch(
+        "app.api.routers.auth.auth_service.login", new_callable=AsyncMock
+    ) as mock_login:
         mock_login.return_value = TokenResponse(
             access_token="access",
             refresh_token="refresh",
@@ -54,7 +59,10 @@ def test_login_success(client: TestClient):
 def test_login_unauthorized(client: TestClient):
     """POST /auth/login retorna 401 quando o serviço levanta UnauthorizedError."""
     from app.core.exceptions import UnauthorizedError
-    with patch("app.api.routers.auth.auth_service.login", new_callable=AsyncMock) as mock_login:
+
+    with patch(
+        "app.api.routers.auth.auth_service.login", new_callable=AsyncMock
+    ) as mock_login:
         mock_login.side_effect = UnauthorizedError("Credentials are invalid")
         resp = client.post(
             "/auth/login",
@@ -66,7 +74,9 @@ def test_login_unauthorized(client: TestClient):
 
 def test_refresh_success(client: TestClient):
     """POST /auth/refresh retorna 200 e novos tokens."""
-    with patch("app.api.routers.auth.auth_service.refresh", new_callable=AsyncMock) as mock_refresh:
+    with patch(
+        "app.api.routers.auth.auth_service.refresh", new_callable=AsyncMock
+    ) as mock_refresh:
         mock_refresh.return_value = TokenResponse(
             access_token="new_access",
             refresh_token="new_refresh",

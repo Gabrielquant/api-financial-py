@@ -7,7 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
 from app.models.user import User
-from app.schemas.category import CategoryCreate, CategoryListResponse, CategoryResponse, CategoryUpdate
+from app.schemas.category import (
+    CategoryCreate,
+    CategoryListResponse,
+    CategoryResponse,
+    CategoryUpdate,
+)
 from app.services.category_service import CategoryService
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -19,7 +24,6 @@ async def create_category(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> CategoryResponse:
-    """Cria categoria do usuário autenticado."""
     category = await CategoryService(db).create(current_user.id, body)
     return CategoryResponse.model_validate(category)
 
@@ -29,7 +33,6 @@ async def list_categories(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> CategoryListResponse:
-    """Lista categorias do usuário autenticado."""
     items = await CategoryService(db).list_by_user(current_user.id)
     return CategoryListResponse(
         items=[CategoryResponse.model_validate(c) for c in items],
@@ -43,7 +46,6 @@ async def delete_category(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    """Remove categoria do usuário autenticado."""
     await CategoryService(db).delete(category_id, current_user.id)
 
 
@@ -54,6 +56,5 @@ async def update_category(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> CategoryResponse:
-    """Atualiza categoria do usuário autenticado."""
     category = await CategoryService(db).update(category_id, current_user.id, body)
     return CategoryResponse.model_validate(category)

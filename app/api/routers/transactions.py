@@ -26,7 +26,6 @@ async def create_transaction(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> TransactionResponse:
-    """Cria transação (receita ou despesa) do usuário autenticado."""
     transaction = await TransactionService(db).create(current_user.id, body)
     return TransactionResponse.model_validate(transaction)
 
@@ -40,7 +39,6 @@ async def list_transactions(
     transaction_type: CategoryType | None = Query(None, alias="type"),
     category_id: UUID | None = None,
 ) -> TransactionListResponse:
-    """Lista transações do usuário autenticado com filtros opcionais."""
     items = await TransactionService(db).list_by_user(
         current_user.id,
         month=month,
@@ -61,8 +59,9 @@ async def get_monthly_summary(
     month: int = Query(..., ge=1, le=12),
     year: int = Query(..., ge=1900, le=2100),
 ) -> MonthlySummaryResponse:
-    """Retorna resumo financeiro mensal do usuário autenticado."""
-    summary = await TransactionService(db).get_monthly_summary(current_user.id, month, year)
+    summary = await TransactionService(db).get_monthly_summary(
+        current_user.id, month, year
+    )
     return MonthlySummaryResponse(**summary)
 
 
@@ -73,6 +72,7 @@ async def update_transaction(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> TransactionResponse:
-    """Atualiza transação do usuário autenticado."""
-    transaction = await TransactionService(db).update(transaction_id, current_user.id, body)
+    transaction = await TransactionService(db).update(
+        transaction_id, current_user.id, body
+    )
     return TransactionResponse.model_validate(transaction)

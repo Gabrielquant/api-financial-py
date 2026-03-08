@@ -43,5 +43,7 @@ class UserRepository:
 
     async def get_by_cognito_id(self, cognito_id: str) -> User | None:
         """Busca usuário por cognito_id (sub do Cognito)."""
-        result = await self._db.execute(select(User).where(User.cognito_id == cognito_id))
+        result = await self._db.execute(
+            select(User).where(User.cognito_id == cognito_id)
+        )
         return result.scalar_one_or_none()

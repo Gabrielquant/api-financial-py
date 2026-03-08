@@ -9,10 +9,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base import Base
+from app.models.category import Category
+from app.models.transaction import Transaction
 
 
 class UserRole(str, enum.Enum):
-
     user = "user"
     admin = "admin"
     auditor = "auditor"
@@ -28,8 +29,12 @@ class User(Base):
         primary_key=True,
         default=uuid.uuid4,
     )
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    cognito_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False, index=True
+    )
+    cognito_id: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False, index=True
+    )
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole),
         nullable=False,

@@ -9,8 +9,6 @@ from app.models.category import CategoryType
 
 
 class CategoryCreate(BaseModel):
-    """Payload para criar categoria."""
-
     name: str = Field(..., min_length=1)
     type: CategoryType
 
@@ -23,8 +21,6 @@ class CategoryCreate(BaseModel):
 
 
 class CategoryUpdate(BaseModel):
-    """Payload para atualizar categoria (PATCH)."""
-
     name: str | None = Field(None, min_length=1)
     type: CategoryType | None = None
 
@@ -39,8 +35,6 @@ class CategoryUpdate(BaseModel):
 
 
 class CategoryResponse(BaseModel):
-    """Resposta de uma categoria."""
-
     id: UUID
     # user_id: UUID
     name: str
@@ -51,7 +45,5 @@ class CategoryResponse(BaseModel):
 
 
 class CategoryListResponse(BaseModel):
-    """Resposta de listagem de categorias."""
-
     items: list[CategoryResponse]
     total: int

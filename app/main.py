@@ -29,7 +29,7 @@ app.include_router(transactions.router)
 
 @app.exception_handler(AppException)
 def app_exception_handler(_request, exc: AppException) -> JSONResponse:
-    """Retorna respostas consistentes para exceções da aplicação."""
+
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail},
@@ -39,8 +39,9 @@ def app_exception_handler(_request, exc: AppException) -> JSONResponse:
 if __name__ == "__main__":
     import sys
     from pathlib import Path
+
     _root = Path(__file__).resolve().parent.parent
     if str(_root) not in sys.path:
         sys.path.insert(0, str(_root))
-    # Sem reload ao rodar python app/main.py; para reload: uvicorn app.main:app --reload
+
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000)

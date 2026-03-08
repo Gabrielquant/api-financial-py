@@ -9,7 +9,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base import Base
-from app.models.category import CategoryType
+from app.models.category import Category, CategoryType
+from app.models.user import User
 
 
 class Transaction(Base):
@@ -52,4 +53,6 @@ class Transaction(Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="transactions")
-    category: Mapped["Category"] = relationship("Category", back_populates="transactions")
+    category: Mapped["Category"] = relationship(
+        "Category", back_populates="transactions"
+    )

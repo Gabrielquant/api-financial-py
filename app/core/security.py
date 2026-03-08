@@ -1,5 +1,3 @@
-"""Segurança: secret hash Cognito, extração/validação JWT (Cognito)."""
-
 import base64
 import hmac
 import hashlib
@@ -14,10 +12,6 @@ from app.schemas.auth import CognitoTokenPayload
 
 
 def cognito_secret_hash(username: str, client_id: str, client_secret: str) -> str:
-    """Calcula o SECRET_HASH para Cognito (app client com secret).
-
-    Obrigatório em SignUp e InitiateAuth quando o app client tem client secret.
-    """
     message = username + client_id
     dig = hmac.new(
         client_secret.encode("utf-8"),
@@ -28,11 +22,7 @@ def cognito_secret_hash(username: str, client_id: str, client_secret: str) -> st
 
 
 def get_token_from_authorization_header(request: Request) -> str:
-    """Extrai o token Bearer do header Authorization.
 
-    Raises:
-        UnauthorizedError: Se o header estiver ausente ou em formato inválido.
-    """
     auth = request.headers.get("Authorization")
     if not auth or not auth.startswith("Bearer "):
         raise UnauthorizedError("Missing or invalid Authorization header")
@@ -43,16 +33,6 @@ def get_token_from_authorization_header(request: Request) -> str:
 
 
 async def decode_and_validate_cognito_token(token: str) -> CognitoTokenPayload:
-    """Decodifica o JWT e valida assinatura e claims com o JWKS do Cognito.
-
-    Valida: assinatura (JWKS), iss, exp.
-
-    Returns:
-        Payload tipado (CognitoTokenPayload).
-
-    Raises:
-        UnauthorizedError: Se o token for inválido ou expirado.
-    """
     jwks_url = (
         f"https://cognito-idp.{settings.COGNITO_REGION}.amazonaws.com/"
         f"{settings.COGNITO_USER_POOL_ID}/.well-known/jwks.json"

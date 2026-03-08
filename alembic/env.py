@@ -1,5 +1,10 @@
 """Alembic migration environment."""
 
+from app.db.base import Base
+from alembic import context
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
 import os
 from logging.config import fileConfig
 
@@ -7,11 +12,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from app.db.base import Base
 
 config = context.config
 url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")

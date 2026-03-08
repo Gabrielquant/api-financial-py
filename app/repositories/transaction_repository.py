@@ -64,7 +64,9 @@ class TransactionRepository:
             q = q.where(Transaction.type == type)
         if category_id is not None:
             q = q.where(Transaction.category_id == category_id)
-        q = q.order_by(Transaction.transaction_date.desc(), Transaction.created_at.desc())
+        q = q.order_by(
+            Transaction.transaction_date.desc(), Transaction.created_at.desc()
+        )
         result = await self._db.execute(q)
         return list(result.scalars().all())
 
@@ -75,21 +77,17 @@ class TransactionRepository:
         year: int,
     ) -> tuple[Decimal, Decimal]:
         """Retorna (total_income, total_expense) do mês/ano para o usuário."""
-        income_q = (
-            select(func.coalesce(func.sum(Transaction.amount), 0)).where(
-                Transaction.user_id == user_id,
-                Transaction.type == CategoryType.income,
-                func.extract("month", Transaction.transaction_date) == month,
-                func.extract("year", Transaction.transaction_date) == year,
-            )
+        income_q = select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            Transaction.user_id == user_id,
+            Transaction.type == CategoryType.income,
+            func.extract("month", Transaction.transaction_date) == month,
+            func.extract("year", Transaction.transaction_date) == year,
         )
-        expense_q = (
-            select(func.coalesce(func.sum(Transaction.amount), 0)).where(
-                Transaction.user_id == user_id,
-                Transaction.type == CategoryType.expense,
-                func.extract("month", Transaction.transaction_date) == month,
-                func.extract("year", Transaction.transaction_date) == year,
-            )
+        expense_q = select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            Transaction.user_id == user_id,
+            Transaction.type == CategoryType.expense,
+            func.extract("month", Transaction.transaction_date) == month,
+            func.extract("year", Transaction.transaction_date) == year,
         )
         income_result = await self._db.execute(income_q)
         expense_result = await self._db.execute(expense_q)

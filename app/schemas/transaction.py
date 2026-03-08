@@ -10,8 +10,6 @@ from app.models.category import CategoryType
 
 
 class TransactionCreate(BaseModel):
-    """Payload para criar transação."""
-
     category_id: UUID
     amount: Decimal = Field(..., gt=0)
     type: CategoryType
@@ -20,8 +18,6 @@ class TransactionCreate(BaseModel):
 
 
 class TransactionUpdate(BaseModel):
-    """Payload para atualizar transação (PATCH)."""
-
     category_id: UUID | None = None
     amount: Decimal | None = Field(None, gt=0)
     type: CategoryType | None = None
@@ -30,8 +26,6 @@ class TransactionUpdate(BaseModel):
 
 
 class TransactionResponse(BaseModel):
-    """Resposta de uma transação."""
-
     id: UUID
     user_id: UUID
     category_id: UUID
@@ -45,15 +39,11 @@ class TransactionResponse(BaseModel):
 
 
 class TransactionListResponse(BaseModel):
-    """Resposta de listagem de transações."""
-
     items: list[TransactionResponse]
     total: int
 
 
 class MonthlySummaryResponse(BaseModel):
-    """Resumo financeiro mensal."""
-
     month: int
     year: int
     total_income: Decimal

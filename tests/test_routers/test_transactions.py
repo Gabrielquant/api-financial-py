@@ -22,6 +22,7 @@ def category_id(test_user):
 def transaction_model(test_user, category_id):
     """Transação fake retornada pelo service mock."""
     from datetime import datetime, timezone
+
     return Transaction(
         id=uuid4(),
         user_id=test_user.id,
@@ -34,7 +35,9 @@ def transaction_model(test_user, category_id):
     )
 
 
-def test_create_transaction_success(client_with_user, test_user, category_id, transaction_model):
+def test_create_transaction_success(
+    client_with_user, test_user, category_id, transaction_model
+):
     """POST /transactions retorna 201 e transação quando o service cria."""
     with patch("app.api.routers.transactions.TransactionService") as MockService:
         mock_instance = MockService.return_value

@@ -5,6 +5,7 @@ Revises: 003_categories
 Create Date: 2025-03-08
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -18,7 +19,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    categorytype_enum = postgresql.ENUM("income", "expense", name="categorytype", create_type=False)
+    categorytype_enum = postgresql.ENUM(
+        "income", "expense", name="categorytype", create_type=False
+    )
     op.create_table(
         "transactions",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
@@ -31,12 +34,28 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["category_id"], ["categories.id"], ondelete="RESTRICT"),
+        sa.ForeignKeyConstraint(
+            ["category_id"], ["categories.id"], ondelete="RESTRICT"
+        ),
     )
-    op.create_index(op.f("ix_transactions_user_id"), "transactions", ["user_id"], unique=False)
-    op.create_index(op.f("ix_transactions_category_id"), "transactions", ["category_id"], unique=False)
-    op.create_index(op.f("ix_transactions_transaction_date"), "transactions", ["transaction_date"], unique=False)
-    op.create_index(op.f("ix_transactions_type"), "transactions", ["type"], unique=False)
+    op.create_index(
+        op.f("ix_transactions_user_id"), "transactions", ["user_id"], unique=False
+    )
+    op.create_index(
+        op.f("ix_transactions_category_id"),
+        "transactions",
+        ["category_id"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("ix_transactions_transaction_date"),
+        "transactions",
+        ["transaction_date"],
+        unique=False,
+    )
+    op.create_index(
+        op.f("ix_transactions_type"), "transactions", ["type"], unique=False
+    )
 
 
 def downgrade() -> None:

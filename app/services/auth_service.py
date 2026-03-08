@@ -22,7 +22,7 @@ def _cognito_client():
 
 
 async def _run_cognito_sign_up(email: str, password: str, secret_hash: str) -> str:
-    """Executa sign_up no Cognito em thread separada. Retorna UserSub."""
+
     def _sync() -> str:
         client = _cognito_client()
         resp = client.sign_up(
@@ -41,7 +41,7 @@ async def _run_cognito_sign_up(email: str, password: str, secret_hash: str) -> s
 
 
 async def _run_cognito_confirm_and_verify(email: str) -> None:
-    """Executa admin_confirm_sign_up e admin_update_user_attributes em thread."""
+
     def _sync() -> None:
         client = _cognito_client()
         client.admin_confirm_sign_up(
@@ -57,8 +57,10 @@ async def _run_cognito_confirm_and_verify(email: str) -> None:
     await asyncio.to_thread(_sync)
 
 
-async def _run_cognito_initiate_auth(email: str, password: str, secret_hash: str) -> dict:
-    """Executa initiate_auth no Cognito em thread."""
+async def _run_cognito_initiate_auth(
+    email: str, password: str, secret_hash: str
+) -> dict:
+
     def _sync() -> dict:
         client = _cognito_client()
         return client.initiate_auth(
@@ -75,7 +77,7 @@ async def _run_cognito_initiate_auth(email: str, password: str, secret_hash: str
 
 
 async def _run_cognito_refresh_token(refresh_token: str, secret_hash: str) -> dict:
-    """Executa initiate_auth com REFRESH_TOKEN_AUTH em thread."""
+
     def _sync() -> dict:
         client = _cognito_client()
         return client.initiate_auth(
@@ -153,16 +155,12 @@ async def login(email: str, password: str, db: AsyncSession) -> TokenResponse:
 
 
 async def refresh(refresh_token: str, email: str, db: AsyncSession) -> TokenResponse:
-    """Obtém novos tokens a partir do refresh token e email (Cognito REFRESH_TOKEN_AUTH).
 
-    O SECRET_HASH deve usar o sub do usuário (Cognito exige isso no refresh). O sub é obtido
-    do usuário no banco (cognito_id), buscado por email.
-    """
     user_repo = UserRepository(db)
     user = await user_repo.get_by_email(email)
     if not user:
         raise UnauthorizedError("Invalid or expired refresh token")
-    # Cognito exige que o SECRET_HASH no REFRESH_TOKEN_AUTH use o sub (não o email)
+
     secret_hash = cognito_secret_hash(
         user.cognito_id,
         settings.COGNITO_CLIENT_ID,

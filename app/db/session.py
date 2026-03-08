@@ -5,11 +5,9 @@ from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import settings
-from app.db.base import Base
 
 
 def _get_async_database_url() -> str:
-    """Converte DATABASE_URL para driver async (postgresql+asyncpg)."""
     url = settings.DATABASE_URL
     if url.startswith("postgresql://"):
         return url.replace("postgresql://", "postgresql+asyncpg://", 1)
@@ -33,7 +31,6 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """Dependency que fornece uma sessão async do banco por request."""
     async with AsyncSessionLocal() as session:
         try:
             yield session

@@ -1,6 +1,5 @@
 """Testes das rotas raiz e health."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 

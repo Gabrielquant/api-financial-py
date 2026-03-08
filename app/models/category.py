@@ -17,18 +17,16 @@ if TYPE_CHECKING:
 
 
 class CategoryType(str, enum.Enum):
-    """Tipo da categoria financeira."""
-
     income = "income"
     expense = "expense"
 
 
 class Category(Base):
-    """Categoria financeira (income/expense) por usuário."""
-
     __tablename__ = "categories"
     __table_args__ = (
-        UniqueConstraint("user_id", "name", "type", name="uq_categories_user_name_type"),
+        UniqueConstraint(
+            "user_id", "name", "type", name="uq_categories_user_name_type"
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(

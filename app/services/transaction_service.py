@@ -13,22 +13,22 @@ from app.schemas.transaction import TransactionCreate, TransactionUpdate
 
 
 class TransactionService:
-    """Lógica de transações."""
-
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
         self._repo = TransactionRepository(db)
         self._category_repo = CategoryRepository(db)
 
     async def create(self, user_id: UUID, data: TransactionCreate):
-        """Cria transação. Valida categoria do usuário e tipo compatível."""
+
         category = await self._category_repo.get_by_id(data.category_id)
         if category is None:
             raise NotFoundError("Categoria não encontrada.")
         if category.user_id != user_id:
             raise ForbiddenError("Você não pode usar uma categoria de outro usuário.")
         if data.type != category.type:
-            raise BadRequestError("O tipo da transação deve ser igual ao tipo da categoria.")
+            raise BadRequestError(
+                "O tipo da transação deve ser igual ao tipo da categoria."
+            )
         return await self._repo.create(
             user_id=user_id,
             category_id=data.category_id,
@@ -47,7 +47,7 @@ class TransactionService:
         type: CategoryType | None = None,
         category_id: UUID | None = None,
     ):
-        """Lista transações do usuário com filtros."""
+
         return await self._repo.list_by_filters(
             user_id,
             month=month,
@@ -57,8 +57,10 @@ class TransactionService:
         )
 
     async def get_monthly_summary(self, user_id: UUID, month: int, year: int) -> dict:
-        """Calcula resumo mensal: total_income, total_expense, balance, saving_rate."""
-        total_income, total_expense = await self._repo.get_monthly_totals(user_id, month, year)
+
+        total_income, total_expense = await self._repo.get_monthly_totals(
+            user_id, month, year
+        )
         balance = total_income - total_expense
         if total_income > 0:
             saving_rate = balance / total_income
@@ -74,20 +76,28 @@ class TransactionService:
         }
 
     async def get_by_id(self, transaction_id: UUID, user_id: UUID):
-        """Busca transação por id. Retorna None se não existir ou não for do usuário."""
+
         transaction = await self._repo.get_by_id(transaction_id)
         if transaction is None or transaction.user_id != user_id:
             return None
         return transaction
 
-    async def update(self, transaction_id: UUID, user_id: UUID, data: TransactionUpdate):
-        """Atualiza transação. Valida ownership e coerência tipo/categoria."""
+    async def update(
+        self, transaction_id: UUID, user_id: UUID, data: TransactionUpdate
+    ):
+
         transaction = await self._repo.get_by_id(transaction_id)
         if transaction is None:
             raise NotFoundError("Transação não encontrada.")
         if transaction.user_id != user_id:
-            raise ForbiddenError("Você não pode alterar uma transação de outro usuário.")
-        category_id = data.category_id if data.category_id is not None else transaction.category_id
+            raise ForbiddenError(
+                "Você não pode alterar uma transação de outro usuário."
+            )
+        category_id = (
+            data.category_id
+            if data.category_id is not None
+            else transaction.category_id
+        )
         category = await self._category_repo.get_by_id(category_id)
         if category is None:
             raise NotFoundError("Categoria não encontrada.")
@@ -95,7 +105,9 @@ class TransactionService:
             raise ForbiddenError("Você não pode usar uma categoria de outro usuário.")
         new_type = data.type if data.type is not None else transaction.type
         if new_type != category.type:
-            raise BadRequestError("O tipo da transação deve ser igual ao tipo da categoria.")
+            raise BadRequestError(
+                "O tipo da transação deve ser igual ao tipo da categoria."
+            )
         return await self._repo.update(
             transaction,
             category_id=data.category_id if data.category_id is not None else None,

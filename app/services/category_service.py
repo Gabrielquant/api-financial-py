@@ -5,14 +5,12 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, ForbiddenError, NotFoundError
-from app.models.category import Category, CategoryType
+from app.models.category import Category
 from app.repositories.category_repository import CategoryRepository
 from app.schemas.category import CategoryCreate, CategoryUpdate
 
 
 class CategoryService:
-    """Lógica de categorias."""
-
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
         self._repo = CategoryRepository(db)
@@ -21,33 +19,37 @@ class CategoryService:
         return name.strip() if name else ""
 
     async def create(self, user_id: UUID, data: CategoryCreate) -> Category:
-        """Cria categoria do usuário. Levanta ConflictError se nome+tipo já existir."""
+
         name = self._normalize_name(data.name)
         if not name:
             raise ConflictError("Nome da categoria não pode ser vazio.")
-        existing = await self._repo.get_by_user_and_name_and_type(user_id, name, data.type)
+        existing = await self._repo.get_by_user_and_name_and_type(
+            user_id, name, data.type
+        )
         if existing:
             raise ConflictError("Categoria já existe para este usuário e tipo.")
         return await self._repo.create(user_id=user_id, name=name, type=data.type)
 
     async def list_by_user(self, user_id: UUID) -> list[Category]:
-        """Lista categorias do usuário."""
+
         return await self._repo.list_by_user_id(user_id)
 
     async def get_by_id(self, category_id: UUID, user_id: UUID) -> Category | None:
-        """Busca categoria por id. Retorna None se não existir ou não for do usuário."""
+
         category = await self._repo.get_by_id(category_id)
         if category is None or category.user_id != user_id:
             return None
         return category
 
     async def delete(self, category_id: UUID, user_id: UUID) -> None:
-        """Remove categoria. Levanta NotFoundError se não existir, ForbiddenError se for de outro usuário."""
+
         category = await self._repo.get_by_id(category_id)
         if category is None:
             raise NotFoundError("Categoria não encontrada.")
         if category.user_id != user_id:
-            raise ForbiddenError("Você não pode deletar uma categoria de outro usuário.")
+            raise ForbiddenError(
+                "Você não pode deletar uma categoria de outro usuário."
+            )
         await self._repo.delete(category)
 
     async def update(
@@ -56,12 +58,14 @@ class CategoryService:
         user_id: UUID,
         data: CategoryUpdate,
     ) -> Category:
-        """Atualiza categoria. Levanta NotFoundError/ForbiddenError/ConflictError conforme regras."""
+
         category = await self._repo.get_by_id(category_id)
         if category is None:
             raise NotFoundError("Categoria não encontrada.")
         if category.user_id != user_id:
-            raise ForbiddenError("Você não pode alterar uma categoria de outro usuário.")
+            raise ForbiddenError(
+                "Você não pode alterar uma categoria de outro usuário."
+            )
         name = self._normalize_name(data.name) if data.name is not None else None
         if name is not None and not name:
             raise ConflictError("Nome da categoria não pode ser vazio.")
@@ -69,7 +73,9 @@ class CategoryService:
         if name is not None or new_type is not None:
             final_name = name if name is not None else category.name
             final_type = new_type if new_type is not None else category.type
-            other = await self._repo.get_by_user_and_name_and_type(user_id, final_name, final_type)
+            other = await self._repo.get_by_user_and_name_and_type(
+                user_id, final_name, final_type
+            )
             if other is not None and other.id != category_id:
                 raise ConflictError("Categoria já existe para este usuário e tipo.")
             category = await self._repo.update(

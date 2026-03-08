@@ -1,7 +1,7 @@
 """Testes das rotas de categorias (/categories)."""
 
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,6 +13,7 @@ from app.models.category import Category, CategoryType
 def category_model(test_user):
     """Categoria fake retornada pelo service mock."""
     from datetime import datetime, timezone
+
     return Category(
         id=uuid.uuid4(),
         user_id=test_user.id,

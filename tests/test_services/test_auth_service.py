@@ -13,8 +13,13 @@ from app.schemas.auth import TokenResponse
 async def test_register_success():
     """register() cria usuário no Cognito e no banco quando não existe."""
     with (
-        patch("app.services.auth_service._run_cognito_sign_up", new_callable=AsyncMock) as mock_sign_up,
-        patch("app.services.auth_service._run_cognito_confirm_and_verify", new_callable=AsyncMock) as mock_confirm,
+        patch(
+            "app.services.auth_service._run_cognito_sign_up", new_callable=AsyncMock
+        ) as mock_sign_up,
+        patch(
+            "app.services.auth_service._run_cognito_confirm_and_verify",
+            new_callable=AsyncMock,
+        ) as mock_confirm,
         patch("app.services.auth_service.UserRepository") as MockUserRepo,
     ):
         mock_sign_up.return_value = "cognito-sub-123"
@@ -33,15 +38,24 @@ async def test_register_success():
         assert result["message"] == "User registered. Email verified. You can sign in."
         mock_sign_up.assert_called_once()
         mock_confirm.assert_called_once()
-        mock_repo.create.assert_called_once_with(email="new@example.com", cognito_id="cognito-sub-123")
+        mock_repo.create.assert_called_once_with(
+            email="new@example.com", cognito_id="cognito-sub-123"
+        )
 
 
 @pytest.mark.asyncio
 async def test_register_username_exists_raises_conflict():
     """register() levanta ConflictError quando Cognito retorna UsernameExistsException."""
-    err = ClientError({"Error": {"Code": "UsernameExistsException", "Message": "Exists"}}, "SignUp")
-    with patch("app.services.auth_service._run_cognito_sign_up", new_callable=AsyncMock, side_effect=err):
+    err = ClientError(
+        {"Error": {"Code": "UsernameExistsException", "Message": "Exists"}}, "SignUp"
+    )
+    with patch(
+        "app.services.auth_service._run_cognito_sign_up",
+        new_callable=AsyncMock,
+        side_effect=err,
+    ):
         from app.services import auth_service
+
         mock_db = MagicMock()
         with pytest.raises(ConflictError) as exc_info:
             await auth_service.register(
@@ -49,7 +63,10 @@ async def test_register_username_exists_raises_conflict():
                 password="senha12345",
                 db=mock_db,
             )
-        assert "already registered" in exc_info.value.detail.lower() or "exists" in str(exc_info.value.detail).lower()
+        assert (
+            "already registered" in exc_info.value.detail.lower()
+            or "exists" in str(exc_info.value.detail).lower()
+        )
 
 
 @pytest.mark.asyncio
@@ -60,13 +77,17 @@ async def test_login_user_not_in_db_raises_unauthorized():
         mock_repo = MockUserRepo.return_value
         mock_repo.get_by_email = AsyncMock(return_value=None)
         from app.services import auth_service
+
         with pytest.raises(UnauthorizedError) as exc_info:
             await auth_service.login(
                 email="unknown@example.com",
                 password="senha123",
                 db=mock_db,
             )
-        assert "invalid" in exc_info.value.detail.lower() or "credentials" in exc_info.value.detail.lower()
+        assert (
+            "invalid" in exc_info.value.detail.lower()
+            or "credentials" in exc_info.value.detail.lower()
+        )
 
 
 @pytest.mark.asyncio
@@ -75,7 +96,10 @@ async def test_login_success_returns_tokens():
     mock_db = MagicMock()
     with (
         patch("app.services.auth_service.UserRepository") as MockUserRepo,
-        patch("app.services.auth_service._run_cognito_initiate_auth", new_callable=AsyncMock) as mock_auth,
+        patch(
+            "app.services.auth_service._run_cognito_initiate_auth",
+            new_callable=AsyncMock,
+        ) as mock_auth,
     ):
         mock_repo = MockUserRepo.return_value
         mock_repo.get_by_email = AsyncMock(return_value=MagicMock())  # user exists
@@ -88,6 +112,7 @@ async def test_login_success_returns_tokens():
             }
         }
         from app.services import auth_service
+
         result = await auth_service.login(
             email="user@example.com",
             password="senha123",
@@ -107,6 +132,7 @@ async def test_refresh_user_not_found_raises_unauthorized():
         mock_repo = MockUserRepo.return_value
         mock_repo.get_by_email = AsyncMock(return_value=None)
         from app.services import auth_service
+
         with pytest.raises(UnauthorizedError):
             await auth_service.refresh(
                 refresh_token="some-refresh",

@@ -5,6 +5,7 @@ Revises: 002_remove_name
 Create Date: 2025-03-08
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -27,7 +28,9 @@ def upgrade() -> None:
         END
         $$;
     """)
-    categorytype_enum = postgresql.ENUM("income", "expense", name="categorytype", create_type=False)
+    categorytype_enum = postgresql.ENUM(
+        "income", "expense", name="categorytype", create_type=False
+    )
     op.create_table(
         "categories",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
@@ -38,7 +41,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
     )
-    op.create_index(op.f("ix_categories_user_id"), "categories", ["user_id"], unique=False)
+    op.create_index(
+        op.f("ix_categories_user_id"), "categories", ["user_id"], unique=False
+    )
     op.create_unique_constraint(
         "uq_categories_user_name_type",
         "categories",
