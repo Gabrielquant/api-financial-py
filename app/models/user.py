@@ -23,7 +23,7 @@ class UserRole(enum.Enum):
 
 
 class User(Base):
-    """Usuário autenticado (id, email, cognito_id, role, timestamps)."""
+
 
     __tablename__ = "users"
 
