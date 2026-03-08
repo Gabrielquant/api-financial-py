@@ -1,29 +1,41 @@
-"""Sessão e engine do banco de dados."""
+"""Sessão e engine do banco de dados (async)."""
 
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import settings
 from app.db.base import Base
 
-engine = create_engine(
-    settings.DATABASE_URL,
+
+def _get_async_database_url() -> str:
+    """Converte DATABASE_URL para driver async (postgresql+asyncpg)."""
+    url = settings.DATABASE_URL
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgresql+psycopg2"):
+        return url.replace("postgresql+psycopg2", "postgresql+asyncpg", 1)
+    return url
+
+
+engine = create_async_engine(
+    _get_async_database_url(),
     pool_pre_ping=True,
 )
 
-SessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
     autocommit=False,
     autoflush=False,
-    bind=engine,
+    expire_on_commit=False,
 )
 
 
-def get_db() -> Generator[Session, None, None]:
-    """Dependency que fornece uma sessão do banco por request."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Dependency que fornece uma sessão async do banco por request."""
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()

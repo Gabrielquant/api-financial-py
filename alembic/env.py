@@ -12,7 +12,6 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from app.db.base import Base
-import app.models  # noqa: F401 - registra tabelas em Base.metadata
 
 config = context.config
 url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")

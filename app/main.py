@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import uvicorn
 
-from app.api.routers import auth
+from app.api.routers import auth, categories, transactions
 from app.core.exceptions import AppException
 
 app = FastAPI(
@@ -23,6 +23,8 @@ def health() -> dict[str, str]:
 
 
 app.include_router(auth.router)
+app.include_router(categories.router)
+app.include_router(transactions.router)
 
 
 @app.exception_handler(AppException)

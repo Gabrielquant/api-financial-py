@@ -1,22 +1,23 @@
 """Rotas de autenticação."""
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
+from app.api.deps import get_current_user, get_db
+from app.models.user import User
+from app.schemas.auth import LoginRequest, RefreshRequest, RegisterRequest, TokenResponse
+from app.schemas.user import UserResponse
 from app.services import auth_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", status_code=201)
-def register(
+async def register(
     body: RegisterRequest,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
-    """Registra novo usuário no Cognito. Confirme o email para poder fazer login."""
-    return auth_service.register(
+    return await auth_service.register(
         email=body.email,
         password=body.password,
         db=db,
@@ -24,13 +25,30 @@ def register(
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(
+async def login(
     body: LoginRequest,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
-    """Autentica com email e senha no Cognito; retorna access e refresh token."""
-    return auth_service.login(
+    return await auth_service.login(
         email=body.email,
         password=body.password,
         db=db,
     )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh(
+    body: RefreshRequest,
+    db: AsyncSession = Depends(get_db),
+) -> TokenResponse:
+    """Obtém novo access_token (e opcionalmente refresh_token) a partir do refresh_token e email."""
+    return await auth_service.refresh(
+        refresh_token=body.refresh_token,
+        email=body.email,
+        db=db,
+    )
+
+
+@router.get("/me", response_model=UserResponse)
+async def me(current_user: User = Depends(get_current_user)) -> UserResponse:
+    return UserResponse.model_validate(current_user)

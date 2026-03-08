@@ -2,7 +2,8 @@
 
 from uuid import UUID
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User, UserRole
 
@@ -10,10 +11,10 @@ from app.models.user import User, UserRole
 class UserRepository:
     """Acesso a dados de User."""
 
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: AsyncSession) -> None:
         self._db = db
 
-    def create(
+    async def create(
         self,
         *,
         email: str,
@@ -27,18 +28,20 @@ class UserRepository:
             role=role,
         )
         self._db.add(user)
-        self._db.commit()
-        self._db.refresh(user)
+        await self._db.commit()
+        await self._db.refresh(user)
         return user
 
-    def get_by_id(self, user_id: UUID) -> User | None:
+    async def get_by_id(self, user_id: UUID) -> User | None:
         """Busca usuário por id (UUID)."""
-        return self._db.get(User, user_id)
+        return await self._db.get(User, user_id)
 
-    def get_by_email(self, email: str) -> User | None:
+    async def get_by_email(self, email: str) -> User | None:
         """Busca usuário por email."""
-        return self._db.query(User).filter(User.email == email).first()
+        result = await self._db.execute(select(User).where(User.email == email))
+        return result.scalar_one_or_none()
 
-    def get_by_cognito_id(self, cognito_id: str) -> User | None:
+    async def get_by_cognito_id(self, cognito_id: str) -> User | None:
         """Busca usuário por cognito_id (sub do Cognito)."""
-        return self._db.query(User).filter(User.cognito_id == cognito_id).first()
+        result = await self._db.execute(select(User).where(User.cognito_id == cognito_id))
+        return result.scalar_one_or_none()

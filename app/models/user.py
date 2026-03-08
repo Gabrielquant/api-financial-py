@@ -5,14 +5,13 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Enum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base import Base
 
 
 class UserRole(str, enum.Enum):
-    """Papel do usuário no sistema."""
 
     user = "user"
     admin = "admin"
@@ -50,4 +49,15 @@ class User(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
+    )
+
+    categories: Mapped[list["Category"]] = relationship(
+        "Category",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    transactions: Mapped[list["Transaction"]] = relationship(
+        "Transaction",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )
