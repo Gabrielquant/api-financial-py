@@ -3,8 +3,6 @@
 import uuid
 from datetime import UTC, datetime
 
-import pytest
-
 from app.models.category import CategoryType
 from app.schemas.category import (
     CategoryCreate,

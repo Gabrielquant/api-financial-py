@@ -16,6 +16,7 @@ def test_cognito_secret_hash():
     assert len(result) > 0
     # resultado é base64
     import base64
+
     decoded = base64.b64decode(result)
     assert len(decoded) == 32
 
@@ -37,7 +38,9 @@ def test_get_token_from_authorization_header_missing_raises():
     request.headers = {}
     with pytest.raises(UnauthorizedError) as exc_info:
         get_token_from_authorization_header(request)
-    assert "Missing" in exc_info.value.detail or "invalid" in exc_info.value.detail.lower()
+    assert (
+        "Missing" in exc_info.value.detail or "invalid" in exc_info.value.detail.lower()
+    )
 
 
 def test_get_token_from_authorization_header_not_bearer_raises():
@@ -86,7 +89,9 @@ async def test_decode_and_validate_cognito_token_success():
 
     with (
         patch("app.core.security.httpx.AsyncClient", return_value=mock_client_instance),
-        patch("app.core.security.jwt.get_unverified_header", return_value={"kid": "kid1"}),
+        patch(
+            "app.core.security.jwt.get_unverified_header", return_value={"kid": "kid1"}
+        ),
         patch("app.core.security.jwk.construct"),
         patch("app.core.security.jwt.decode") as mock_decode,
         patch("app.core.security.settings") as mock_settings,
@@ -145,7 +150,10 @@ async def test_decode_and_validate_cognito_token_key_not_found_raises():
 
     with (
         patch("app.core.security.httpx.AsyncClient", return_value=mock_client),
-        patch("app.core.security.jwt.get_unverified_header", return_value={"kid": "missing"}),
+        patch(
+            "app.core.security.jwt.get_unverified_header",
+            return_value={"kid": "missing"},
+        ),
     ):
         with pytest.raises(UnauthorizedError) as exc_info:
             await decode_and_validate_cognito_token("token")
@@ -154,11 +162,12 @@ async def test_decode_and_validate_cognito_token_key_not_found_raises():
 
 @pytest.mark.asyncio
 async def test_decode_and_validate_cognito_token_iss_mismatch_raises():
-    """decode_and_validate_cognito_token levanta quando iss do payload não confere."""
     from app.core.security import decode_and_validate_cognito_token
 
     mock_response = MagicMock()
-    mock_response.json.return_value = {"keys": [{"kid": "kid1", "kty": "RSA", "n": "x", "e": "AQAB"}]}
+    mock_response.json.return_value = {
+        "keys": [{"kid": "kid1", "kty": "RSA", "n": "x", "e": "AQAB"}]
+    }
     mock_response.raise_for_status = MagicMock()
     mock_client = MagicMock()
     mock_client.get = AsyncMock(return_value=mock_response)
@@ -167,7 +176,9 @@ async def test_decode_and_validate_cognito_token_iss_mismatch_raises():
 
     with (
         patch("app.core.security.httpx.AsyncClient", return_value=mock_client),
-        patch("app.core.security.jwt.get_unverified_header", return_value={"kid": "kid1"}),
+        patch(
+            "app.core.security.jwt.get_unverified_header", return_value={"kid": "kid1"}
+        ),
         patch("app.core.security.jwk.construct"),
         patch("app.core.security.jwt.decode") as mock_decode,
         patch("app.core.security.settings") as mock_settings,
@@ -190,12 +201,14 @@ async def test_decode_and_validate_cognito_token_iss_mismatch_raises():
 
 @pytest.mark.asyncio
 async def test_decode_and_validate_cognito_token_jwt_error_raises():
-    """decode_and_validate_cognito_token levanta quando jwt.decode falha."""
-    from app.core.security import decode_and_validate_cognito_token
     from jose import JWTError
 
+    from app.core.security import decode_and_validate_cognito_token
+
     mock_response = MagicMock()
-    mock_response.json.return_value = {"keys": [{"kid": "k", "kty": "RSA", "n": "x", "e": "AQAB"}]}
+    mock_response.json.return_value = {
+        "keys": [{"kid": "k", "kty": "RSA", "n": "x", "e": "AQAB"}]
+    }
     mock_response.raise_for_status = MagicMock()
     mock_client = MagicMock()
     mock_client.get = AsyncMock(return_value=mock_response)
@@ -210,12 +223,14 @@ async def test_decode_and_validate_cognito_token_jwt_error_raises():
     ):
         with pytest.raises(UnauthorizedError) as exc_info:
             await decode_and_validate_cognito_token("token")
-        assert "expired" in exc_info.value.detail.lower() or "invalid" in exc_info.value.detail.lower()
+        assert (
+            "expired" in exc_info.value.detail.lower()
+            or "invalid" in exc_info.value.detail.lower()
+        )
 
 
 @pytest.mark.asyncio
 async def test_decode_and_validate_cognito_token_fetch_jwks_fails_raises():
-    """decode_and_validate_cognito_token levanta quando não consegue buscar JWKS."""
     from app.core.security import decode_and_validate_cognito_token
 
     mock_client_instance = MagicMock()
@@ -229,4 +244,6 @@ async def test_decode_and_validate_cognito_token_fetch_jwks_fails_raises():
     ):
         with pytest.raises(UnauthorizedError) as exc_info:
             await decode_and_validate_cognito_token("token")
-        assert "JWKS" in exc_info.value.detail or "fetch" in exc_info.value.detail.lower()
+        assert (
+            "JWKS" in exc_info.value.detail or "fetch" in exc_info.value.detail.lower()
+        )

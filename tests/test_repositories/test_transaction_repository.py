@@ -37,16 +37,6 @@ def category_id():
 async def test_create(mock_db, user_id, category_id):
     """create() adiciona transação, commit e refresh."""
     repo = TransactionRepository(mock_db)
-    tx = Transaction(
-        id=uuid4(),
-        user_id=user_id,
-        category_id=category_id,
-        amount=Decimal("100.00"),
-        type=CategoryType.expense,
-        description="Almoço",
-        transaction_date=date(2025, 3, 1),
-        created_at=datetime.now(UTC),
-    )
     mock_db.refresh.side_effect = lambda obj: obj
 
     result = await repo.create(

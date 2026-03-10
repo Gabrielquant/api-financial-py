@@ -1,5 +1,3 @@
-"""Testes do CategoryRepository."""
-
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
@@ -17,7 +15,7 @@ def mock_db():
     db.commit = AsyncMock()
     db.refresh = AsyncMock()
     db.get = AsyncMock()
-    db.delete = AsyncMock()  # category_repository usa await self._db.delete()
+    db.delete = AsyncMock()
     db.execute = AsyncMock()
     return db
 
@@ -29,7 +27,6 @@ def user_id():
 
 @pytest.mark.asyncio
 async def test_create(mock_db, user_id):
-    """create() adiciona categoria, faz commit e refresh."""
     repo = CategoryRepository(mock_db)
     new_cat = Category(
         id=uuid4(),
@@ -40,7 +37,9 @@ async def test_create(mock_db, user_id):
     )
     mock_db.refresh.side_effect = lambda obj: setattr(obj, "id", new_cat.id) or obj
 
-    result = await repo.create(user_id=user_id, name="Alimentação", type=CategoryType.expense)
+    result = await repo.create(
+        user_id=user_id, name="Alimentação", type=CategoryType.expense
+    )
 
     mock_db.add.assert_called_once()
     mock_db.commit.assert_awaited_once()
@@ -51,7 +50,6 @@ async def test_create(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_get_by_id(mock_db, user_id):
-    """get_by_id() retorna categoria ou None."""
     repo = CategoryRepository(mock_db)
     cat = Category(
         id=uuid4(),
@@ -70,7 +68,6 @@ async def test_get_by_id(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_get_by_id_not_found(mock_db):
-    """get_by_id() retorna None quando não existe."""
     repo = CategoryRepository(mock_db)
     mock_db.get.return_value = None
 
@@ -81,7 +78,6 @@ async def test_get_by_id_not_found(mock_db):
 
 @pytest.mark.asyncio
 async def test_get_by_user_and_name_and_type(mock_db, user_id):
-    """get_by_user_and_name_and_type() retorna categoria ou None."""
     repo = CategoryRepository(mock_db)
     cat = Category(
         id=uuid4(),
@@ -104,7 +100,6 @@ async def test_get_by_user_and_name_and_type(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_list_by_user_id(mock_db, user_id):
-    """list_by_user_id() retorna lista de categorias ordenadas por nome."""
     repo = CategoryRepository(mock_db)
     cats = [
         Category(
@@ -136,7 +131,6 @@ async def test_list_by_user_id(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_delete(mock_db, user_id):
-    """delete() remove categoria e faz commit."""
     repo = CategoryRepository(mock_db)
     cat = Category(
         id=uuid4(),
@@ -154,7 +148,6 @@ async def test_delete(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_update_name_only(mock_db, user_id):
-    """update() atualiza apenas name quando type é None."""
     repo = CategoryRepository(mock_db)
     cat = Category(
         id=uuid4(),
@@ -174,7 +167,6 @@ async def test_update_name_only(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_update_type_only(mock_db, user_id):
-    """update() atualiza apenas type quando name é None."""
     repo = CategoryRepository(mock_db)
     cat = Category(
         id=uuid4(),
@@ -193,7 +185,6 @@ async def test_update_type_only(mock_db, user_id):
 
 @pytest.mark.asyncio
 async def test_update_both(mock_db, user_id):
-    """update() atualiza name e type."""
     repo = CategoryRepository(mock_db)
     cat = Category(
         id=uuid4(),
