@@ -1,6 +1,7 @@
 """Schemas de categoria (CategoryCreate, CategoryResponse, etc.)."""
 
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
@@ -8,31 +9,32 @@ from pydantic import BaseModel, Field, field_validator
 from app.models.category import CategoryType
 
 
-class CategoryCreate(BaseModel):
+class CategoryBase(BaseModel):
     name: str = Field(..., min_length=1)
     type: CategoryType
 
     @field_validator("name", mode="before")
     @classmethod
-    def strip_name(cls, v: str) -> str:
-        if isinstance(v, str):
-            return v.strip()
-        return v
-
-
-class CategoryUpdate(BaseModel):
-    name: str | None = Field(None, min_length=1)
-    type: CategoryType | None = None
-
-    @field_validator("name", mode="before")
-    @classmethod
-    def strip_name(cls, v: str | None) -> str | None:
+    def strip_name(cls, v):
         if v is None:
-            return None
+            return v
+
         if isinstance(v, str):
-            return v.strip()
+            v = v.strip()
+
+            if not v:
+                raise ValueError("name cannot be empty or blank")
+
         return v
 
+
+class CategoryCreate(CategoryBase):
+    pass
+
+
+class CategoryUpdate(CategoryBase):
+    name: Optional[str] = Field(None, min_length=1)
+    type: Optional[CategoryType] = Field(None, description="The type of the category")
 
 class CategoryResponse(BaseModel):
     id: UUID

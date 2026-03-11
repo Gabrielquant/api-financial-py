@@ -21,7 +21,6 @@ class CategoryRepository:
         name: str,
         type: CategoryType,
     ) -> Category:
-        """Cria uma categoria no banco."""
         category = Category(
             user_id=user_id,
             name=name,
@@ -33,7 +32,6 @@ class CategoryRepository:
         return category
 
     async def get_by_id(self, category_id: UUID) -> Category | None:
-        """Busca categoria por id."""
         return await self._db.get(Category, category_id)
 
     async def get_by_user_and_name_and_type(
@@ -42,7 +40,6 @@ class CategoryRepository:
         name: str,
         type: CategoryType,
     ) -> Category | None:
-        """Busca categoria por usuário, nome e tipo."""
         result = await self._db.execute(
             select(Category).where(
                 Category.user_id == user_id,
@@ -53,14 +50,12 @@ class CategoryRepository:
         return result.scalar_one_or_none()
 
     async def list_by_user_id(self, user_id: UUID) -> list[Category]:
-        """Lista categorias do usuário."""
         result = await self._db.execute(
             select(Category).where(Category.user_id == user_id).order_by(Category.name)
         )
         return list(result.scalars().all())
 
     async def delete(self, category: Category) -> None:
-        """Remove uma categoria."""
         await self._db.delete(category)
         await self._db.commit()
 
@@ -71,7 +66,6 @@ class CategoryRepository:
         name: str | None = None,
         type: CategoryType | None = None,
     ) -> Category:
-        """Atualiza nome e/ou tipo da categoria."""
         if name is not None:
             category.name = name
         if type is not None:

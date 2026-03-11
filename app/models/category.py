@@ -1,6 +1,6 @@
 """Model Category."""
 
-import enum
+from enum import StrEnum
 import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     from app.models.user import User
 
 
-class CategoryType(enum.Enum):
-    income = "income"
-    expense = "expense"
+class CategoryType(StrEnum):
+    INCOME = "income"
+    EXPENSE = "expense"
 
 
 class Category(Base):

@@ -12,8 +12,6 @@ from app.models.transaction import Transaction
 
 
 class TransactionRepository:
-    """Acesso a dados de Transaction."""
-
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
 
@@ -27,7 +25,6 @@ class TransactionRepository:
         description: str | None,
         transaction_date: date,
     ) -> Transaction:
-        """Cria uma transação no banco."""
         transaction = Transaction(
             user_id=user_id,
             category_id=category_id,
@@ -42,7 +39,6 @@ class TransactionRepository:
         return transaction
 
     async def get_by_id(self, transaction_id: UUID) -> Transaction | None:
-        """Busca transação por id."""
         return await self._db.get(Transaction, transaction_id)
 
     async def list_by_filters(
@@ -54,7 +50,6 @@ class TransactionRepository:
         type: CategoryType | None = None,
         category_id: UUID | None = None,
     ) -> list[Transaction]:
-        """Lista transações do usuário com filtros opcionais."""
         q = select(Transaction).where(Transaction.user_id == user_id)
         if month is not None:
             q = q.where(func.extract("month", Transaction.transaction_date) == month)
@@ -76,7 +71,6 @@ class TransactionRepository:
         month: int,
         year: int,
     ) -> tuple[Decimal, Decimal]:
-        """Retorna (total_income, total_expense) do mês/ano para o usuário."""
         income_q = select(func.coalesce(func.sum(Transaction.amount), 0)).where(
             Transaction.user_id == user_id,
             Transaction.type == CategoryType.income,

@@ -2,27 +2,29 @@
 
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from app.models.category import CategoryType
 
-
-class TransactionCreate(BaseModel):
+class TransactionBaseModel(BaseModel):
     category_id: UUID
     amount: Decimal = Field(..., gt=0)
     type: CategoryType
-    description: str | None = Field(None, max_length=500)
+    description: Optional[str] = Field(None, max_length=500)
     transaction_date: date
 
+class TransactionCreate(TransactionBaseModel):
+    pass
 
-class TransactionUpdate(BaseModel):
-    category_id: UUID | None = None
-    amount: Decimal | None = Field(None, gt=0)
-    type: CategoryType | None = None
-    description: str | None = None
-    transaction_date: date | None = None
+class TransactionUpdate(TransactionBaseModel):
+    category_id: Optional[UUID] 
+    amount: Optional[Decimal] = Field(None, gt=0)
+    type: Optional[CategoryType] 
+    description: Optional[str] 
+    transaction_date: Optional[date] 
 
 
 class TransactionResponse(BaseModel):
@@ -31,7 +33,7 @@ class TransactionResponse(BaseModel):
     category_id: UUID
     amount: Decimal
     type: CategoryType
-    description: str | None
+    description: Optional[str]
     transaction_date: date
     created_at: datetime
 
