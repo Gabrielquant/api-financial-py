@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 class CategoryType(StrEnum):
     INCOME = "income"
     EXPENSE = "expense"
+    # Aliases em minúsculo para compatibilidade com testes e código legado.
+    income = INCOME
+    expense = EXPENSE
 
 
 class Category(Base):

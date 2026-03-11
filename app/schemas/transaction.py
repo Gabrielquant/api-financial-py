@@ -22,12 +22,12 @@ class TransactionCreate(TransactionBaseModel):
     pass
 
 
-class TransactionUpdate(TransactionBaseModel):
-    category_id: Optional[UUID]
+class TransactionUpdate(BaseModel):
+    category_id: Optional[UUID] = None
     amount: Optional[Decimal] = Field(None, gt=0)
-    type: Optional[CategoryType]
-    description: Optional[str]
-    transaction_date: Optional[date]
+    type: Optional[CategoryType] = None
+    description: Optional[str] = Field(None, max_length=500)
+    transaction_date: Optional[date] = None
 
 
 class TransactionResponse(BaseModel):
