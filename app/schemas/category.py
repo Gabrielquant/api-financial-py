@@ -36,6 +36,7 @@ class CategoryUpdate(CategoryBase):
     name: Optional[str] = Field(None, min_length=1)
     type: Optional[CategoryType] = Field(None, description="The type of the category")
 
+
 class CategoryResponse(BaseModel):
     id: UUID
     # user_id: UUID

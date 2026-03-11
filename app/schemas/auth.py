@@ -1,17 +1,16 @@
-"""Schemas de autenticação (LoginRequest, TokenResponse, etc.)."""
-
 from typing import Optional
+
 from pydantic import BaseModel, EmailStr, Field
 
 
 class CognitoTokenPayload(BaseModel):
     sub: str
     exp: int
-    iss: str 
-    email: Optional[str] 
-    token_use: Optional[str] 
-    client_id: Optional[str] 
-    username: Optional[str] 
+    iss: str
+    email: Optional[str]
+    token_use: Optional[str]
+    client_id: Optional[str]
+    username: Optional[str]
 
 
 class RegisterRequest(BaseModel):

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from app.models.category import CategoryType
 
+
 class TransactionBaseModel(BaseModel):
     category_id: UUID
     amount: Decimal = Field(..., gt=0)
@@ -16,15 +17,17 @@ class TransactionBaseModel(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
     transaction_date: date
 
+
 class TransactionCreate(TransactionBaseModel):
     pass
 
+
 class TransactionUpdate(TransactionBaseModel):
-    category_id: Optional[UUID] 
+    category_id: Optional[UUID]
     amount: Optional[Decimal] = Field(None, gt=0)
-    type: Optional[CategoryType] 
-    description: Optional[str] 
-    transaction_date: Optional[date] 
+    type: Optional[CategoryType]
+    description: Optional[str]
+    transaction_date: Optional[date]
 
 
 class TransactionResponse(BaseModel):

@@ -1,8 +1,6 @@
-"""Model Category."""
-
-from enum import StrEnum
 import uuid
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum, ForeignKey, String, UniqueConstraint
