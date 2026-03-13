@@ -1,5 +1,3 @@
-"""Rotas de autenticação."""
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -46,7 +44,6 @@ async def refresh(
     body: RefreshRequest,
     db: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
-    """Obtém novo access_token (e opcionalmente refresh_token) a partir do refresh_token e email."""
     return await auth_service.refresh(
         refresh_token=body.refresh_token,
         email=body.email,

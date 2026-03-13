@@ -1,5 +1,3 @@
-"""Serviço de autenticação (registro, login, sync com Cognito)."""
-
 import asyncio
 from typing import Any, cast
 

@@ -1,5 +1,3 @@
-"""Testes das dependências da API (get_current_user)."""
-
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -11,7 +9,6 @@ from app.models.user import User, UserRole
 
 @pytest.mark.asyncio
 async def test_get_current_user_success():
-    """get_current_user retorna User quando token é válido e usuário existe."""
     from app.api.deps import get_current_user
 
     request = MagicMock(spec=Request)
@@ -48,7 +45,6 @@ async def test_get_current_user_success():
 
 @pytest.mark.asyncio
 async def test_get_current_user_not_found_raises_unauthorized():
-    """get_current_user levanta UnauthorizedError quando usuário não existe no banco."""
     from app.api.deps import get_current_user
 
     request = MagicMock(spec=Request)

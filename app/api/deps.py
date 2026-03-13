@@ -1,5 +1,3 @@
-"""Dependencies da API (sessão, usuário autenticado, etc.)."""
-
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 

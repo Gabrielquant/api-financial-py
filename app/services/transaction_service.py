@@ -1,5 +1,3 @@
-"""Serviço de transações e resumo mensal."""
-
 from decimal import Decimal
 from uuid import UUID
 

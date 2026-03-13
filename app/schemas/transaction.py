@@ -1,5 +1,3 @@
-"""Schemas de transação (TransactionCreate, TransactionResponse, MonthlySummary, etc.)."""
-
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional

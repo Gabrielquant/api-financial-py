@@ -1,5 +1,3 @@
-"""Schemas de usuário (UserCreate, UserResponse, etc.)."""
-
 from datetime import datetime
 from uuid import UUID
 

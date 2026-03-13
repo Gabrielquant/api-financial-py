@@ -1,5 +1,3 @@
-"""Testes do módulo core.security."""
-
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -8,7 +6,6 @@ from app.core.exceptions import UnauthorizedError
 
 
 def test_cognito_secret_hash():
-    """cognito_secret_hash retorna base64 do HMAC-SHA256."""
     from app.core.security import cognito_secret_hash
 
     result = cognito_secret_hash("user", "client-id", "client-secret")
@@ -22,7 +19,6 @@ def test_cognito_secret_hash():
 
 
 def test_get_token_from_authorization_header_success():
-    """get_token_from_authorization_header retorna o token quando Bearer é válido."""
     from app.core.security import get_token_from_authorization_header
 
     request = MagicMock()
@@ -31,7 +27,6 @@ def test_get_token_from_authorization_header_success():
 
 
 def test_get_token_from_authorization_header_missing_raises():
-    """get_token_from_authorization_header levanta quando Authorization está ausente."""
     from app.core.security import get_token_from_authorization_header
 
     request = MagicMock()
@@ -44,7 +39,6 @@ def test_get_token_from_authorization_header_missing_raises():
 
 
 def test_get_token_from_authorization_header_not_bearer_raises():
-    """get_token_from_authorization_header levanta quando não é Bearer."""
     from app.core.security import get_token_from_authorization_header
 
     request = MagicMock()
@@ -54,7 +48,6 @@ def test_get_token_from_authorization_header_not_bearer_raises():
 
 
 def test_get_token_from_authorization_header_empty_token_raises():
-    """get_token_from_authorization_header levanta quando token após Bearer está vazio."""
     from app.core.security import get_token_from_authorization_header
 
     request = MagicMock()
@@ -65,7 +58,6 @@ def test_get_token_from_authorization_header_empty_token_raises():
 
 @pytest.mark.asyncio
 async def test_decode_and_validate_cognito_token_success():
-    """decode_and_validate_cognito_token retorna payload quando JWKS e token são válidos."""
     from app.core.security import decode_and_validate_cognito_token
 
     fake_jwks = {
@@ -115,7 +107,6 @@ async def test_decode_and_validate_cognito_token_success():
 
 @pytest.mark.asyncio
 async def test_decode_and_validate_cognito_token_no_kid_raises():
-    """decode_and_validate_cognito_token levanta quando header não tem kid."""
     from app.core.security import decode_and_validate_cognito_token
 
     mock_response = MagicMock()
@@ -137,7 +128,6 @@ async def test_decode_and_validate_cognito_token_no_kid_raises():
 
 @pytest.mark.asyncio
 async def test_decode_and_validate_cognito_token_key_not_found_raises():
-    """decode_and_validate_cognito_token levanta quando kid não está em keys."""
     from app.core.security import decode_and_validate_cognito_token
 
     mock_response = MagicMock()

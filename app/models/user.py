@@ -1,5 +1,3 @@
-"""Model User."""
-
 import enum
 import uuid
 from datetime import UTC, datetime
