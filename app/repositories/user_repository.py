@@ -9,7 +9,6 @@ from app.models.user import User, UserRole
 
 
 class UserRepository:
-
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
 

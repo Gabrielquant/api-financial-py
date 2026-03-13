@@ -67,20 +67,22 @@ async def _run_cognito_initiate_auth(
         return cast(
             dict[str, Any],
             client.initiate_auth(
-            AuthFlow="USER_PASSWORD_AUTH",
-            AuthParameters={
-                "USERNAME": email,
-                "PASSWORD": password,
-                "SECRET_HASH": secret_hash,
-            },
-            ClientId=settings.COGNITO_CLIENT_ID,
+                AuthFlow="USER_PASSWORD_AUTH",
+                AuthParameters={
+                    "USERNAME": email,
+                    "PASSWORD": password,
+                    "SECRET_HASH": secret_hash,
+                },
+                ClientId=settings.COGNITO_CLIENT_ID,
             ),
         )
 
     return await asyncio.to_thread(_sync)
 
 
-async def _run_cognito_refresh_token(refresh_token: str, secret_hash: str) -> dict[str, Any]:
+async def _run_cognito_refresh_token(
+    refresh_token: str, secret_hash: str
+) -> dict[str, Any]:
 
     def _sync() -> dict[str, Any]:
         client = _cognito_client()
