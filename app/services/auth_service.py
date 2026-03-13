@@ -1,6 +1,7 @@
 """Serviço de autenticação (registro, login, sync com Cognito)."""
 
 import asyncio
+from typing import Any, cast
 
 import boto3
 from botocore.exceptions import ClientError
@@ -35,7 +36,7 @@ async def _run_cognito_sign_up(email: str, password: str, secret_hash: str) -> s
                 {"Name": "preferred_username", "Value": email},
             ],
         )
-        return resp["UserSub"]
+        return str(resp["UserSub"])
 
     return await asyncio.to_thread(_sync)
 
@@ -59,11 +60,13 @@ async def _run_cognito_confirm_and_verify(email: str) -> None:
 
 async def _run_cognito_initiate_auth(
     email: str, password: str, secret_hash: str
-) -> dict:
+) -> dict[str, Any]:
 
-    def _sync() -> dict:
+    def _sync() -> dict[str, Any]:
         client = _cognito_client()
-        return client.initiate_auth(
+        return cast(
+            dict[str, Any],
+            client.initiate_auth(
             AuthFlow="USER_PASSWORD_AUTH",
             AuthParameters={
                 "USERNAME": email,
@@ -71,22 +74,26 @@ async def _run_cognito_initiate_auth(
                 "SECRET_HASH": secret_hash,
             },
             ClientId=settings.COGNITO_CLIENT_ID,
+            ),
         )
 
     return await asyncio.to_thread(_sync)
 
 
-async def _run_cognito_refresh_token(refresh_token: str, secret_hash: str) -> dict:
+async def _run_cognito_refresh_token(refresh_token: str, secret_hash: str) -> dict[str, Any]:
 
-    def _sync() -> dict:
+    def _sync() -> dict[str, Any]:
         client = _cognito_client()
-        return client.initiate_auth(
-            AuthFlow="REFRESH_TOKEN_AUTH",
-            AuthParameters={
-                "REFRESH_TOKEN": refresh_token,
-                "SECRET_HASH": secret_hash,
-            },
-            ClientId=settings.COGNITO_CLIENT_ID,
+        return cast(
+            dict[str, Any],
+            client.initiate_auth(
+                AuthFlow="REFRESH_TOKEN_AUTH",
+                AuthParameters={
+                    "REFRESH_TOKEN": refresh_token,
+                    "SECRET_HASH": secret_hash,
+                },
+                ClientId=settings.COGNITO_CLIENT_ID,
+            ),
         )
 
     return await asyncio.to_thread(_sync)

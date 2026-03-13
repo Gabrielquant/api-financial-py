@@ -32,9 +32,22 @@ class CategoryCreate(CategoryBase):
     pass
 
 
-class CategoryUpdate(CategoryBase):
+class CategoryUpdate(BaseModel):
+    """Update schema: all fields optional."""
+
     name: Optional[str] = Field(None, min_length=1)
     type: Optional[CategoryType] = Field(None, description="The type of the category")
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def strip_name(cls, v):
+        if v is None:
+            return v
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                raise ValueError("name cannot be empty or blank")
+        return v
 
 
 class CategoryResponse(BaseModel):

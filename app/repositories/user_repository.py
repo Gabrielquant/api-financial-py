@@ -9,7 +9,6 @@ from app.models.user import User, UserRole
 
 
 class UserRepository:
-    """Acesso a dados de User."""
 
     def __init__(self, db: AsyncSession) -> None:
         self._db = db
@@ -21,7 +20,7 @@ class UserRepository:
         cognito_id: str,
         role: UserRole = UserRole.user,
     ) -> User:
-        """Cria um usuário no banco."""
+
         user = User(
             email=email,
             cognito_id=cognito_id,
@@ -33,11 +32,9 @@ class UserRepository:
         return user
 
     async def get_by_id(self, user_id: UUID) -> User | None:
-        """Busca usuário por id (UUID)."""
         return await self._db.get(User, user_id)
 
     async def get_by_email(self, email: str) -> User | None:
-        """Busca usuário por email."""
         result = await self._db.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 

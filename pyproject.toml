@@ -36,3 +36,13 @@ ignore = [
     "B008",   # do not perform function calls in argument defaults (FastAPI Depends() é intencional)
     "UP045",
 ]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = ["jose", "jose.*", "boto3", "boto3.*", "botocore", "botocore.*"]
+ignore_missing_imports = true
