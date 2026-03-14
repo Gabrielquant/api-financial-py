@@ -21,6 +21,8 @@ exclude = [
 [tool.ruff.format]
 quote-style = "double"
 
+
+
 [tool.ruff.lint]
 select = [
     "E",      # pycodestyle errors
@@ -36,6 +38,7 @@ ignore = [
     "B008",   # do not perform function calls in argument defaults (FastAPI Depends() é intencional)
     "UP045",
 ]
+fixable = ["ALL"]
 
 [tool.mypy]
 python_version = "3.12"
