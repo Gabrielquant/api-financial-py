@@ -1,2 +1,0 @@
-class DashboardRepository:
-    pass

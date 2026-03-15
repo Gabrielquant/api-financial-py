@@ -47,12 +47,6 @@ def test_app_exception_handler_returns_json_with_status_code(client_with_user):
         app.dependency_overrides.pop(get_db, None)
 
 
-def test_dashboard_router_loaded(client: TestClient):
-    """Router de dashboard está montado (rota existe, retorna 404 sem endpoint)."""
-    resp = client.get("/dashboard/")
-    assert resp.status_code == 404
-
-
 def test_main_module_runnable(monkeypatch):
     """Bloco if __name__ == '__main__' é executável (cobre main.py 40-47)."""
     import runpy
